@@ -5,10 +5,8 @@ const bcrypt = require('bcrypt');
 const dbConnection = require('./database');
 const { body, validationResult } = require('express-validator');
 const app = express();
-
 const server = require("http").Server(app);
 const { v4: uuidv4 } = require("uuid");
-
 const { ExpressPeerServer } = require("peer");
 const opinions = {
     debug: true,
@@ -21,11 +19,11 @@ const io = require("socket.io")(server, {
     }
 });
 app.get("/room", (req,res,next) => {
-    // let id = req.params.id;
-    // dbConnection.query("SELECT * FROM `users` ",[id])
-    // .then(([rows]) => {
-        res.render('room',{ roomId: req.params.room });
-    // });
+     let id = req.params.id;
+     dbConnection.query("SELECT * FROM `users` ",[id])
+     .then(([rows]) => {
+        res.render('room',{name:rows[0].name,roomId: req.params.room});
+     });
   });
 
 // app.get("room/:room", (req, res) => {
@@ -78,10 +76,10 @@ const ifLoggedin = (req,res,next) => {
 }
 const ifEdit = (req,res,next) => {
     if(req.session.isLoggedIn){
-        return res.redirect('/admin');
-        // return res.send(`<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-        // <center><br><br>EDIT SUCCESS <br><br>
-        // <a href="/admin" class="btn btn-primary">ADMIN</a></center>`);
+        // return res.redirect('/admin');
+        return res.send(`<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <center><br><br>EDIT SUCCESS <br><br>
+        <a href="/admin" class="btn btn-primary">ADMIN</a></center>`);
     }
     next();
 }
@@ -207,13 +205,7 @@ app.post('/', ifLoggedin, [
 });
 // END OF LOGIN PAGE
 
-// LOGOUT
-app.get('/logout',(req,res)=>{
-    //session destroy
-    req.session = null;
-    res.redirect('/');
-});
-// END OF LOGOUT
+
 
 // app.use('/', (req,res) => {
 //     res.status(404).send('<h1>404 Page Not Found!</h1>');
@@ -224,38 +216,107 @@ app.get("/Register", (req,res,next) => {
   app.get("/Login", (req,res,next) => {
     res.render('Login');
 });
+app.get("/adminAction/Add", ifNotLoggedin,(req,res,next) => {
+    res.render('adminAction/Add');
+});
 
-app.get("/admin", (req,res,next) => {
+app.post('/adminAction/Add', ifNotLoggedin, 
+// post data validation(using express-validator)
+[
+    body('user_email','Invalid email address!').isEmail().custom((value) => {
+        return dbConnection.execute('SELECT `email` FROM `users` WHERE `email`=?', [value])
+        .then(([rows]) => {
+            if(rows.length > 0){
+                return Promise.reject('This E-mail already in use!');
+            }
+            return true;
+        });
+    }),
+    body('user_name','Username is Empty!').trim().not().isEmpty(),
+    body('user_pass','The password must be of minimum length 6 characters').trim().isLength({ min: 6 }),
+],// end of post data validation
+(req,res,next) => {
+
+    const validation_result = validationResult(req);
+    const {user_name, user_pass, user_email} = req.body;
+    // IF validation_result HAS NO ERROR
+    if(validation_result.isEmpty()){
+        // password encryption (using bcryptjs)
+        bcrypt.hash(user_pass, 12).then((hash_pass) => {
+            // INSERTING USER INTO DATABASE
+            dbConnection.execute("INSERT INTO `users`(`name`,`email`,`password`) VALUES(?,?,?)",[user_name,user_email, hash_pass])
+            .then(result => {
+                res.redirect('/admin')
+            }).catch(err => {
+                // THROW INSERTING USER ERROR'S
+                if (err) throw err;
+            });
+        })
+        .catch(err => {
+            // THROW HASING ERROR'S
+            if (err) throw err;
+        })
+    }
+});
+
+app.get("/admin",  ifNotLoggedin,(req,res,next) => {
     dbConnection.query("SELECT * FROM `users` ",[req.session.userID])
     .then(([rows]) => {
         res.render('admin',{data:rows});
     });
   });
 
-  app.get("/adminAction/edit/(:id)", (req,res,next) => {
+  app.get("/adminAction/edit/(:id)",ifNotLoggedin, (req,res,next) => {
     let id = req.params.id;
     dbConnection.query('SELECT * FROM users WHERE id = ?', [id], [res,req])
     .then(([rows]) => {
         res.render('adminAction/Edit',{data:rows[0]});
     });
   });
+ 
+  
+  app.post('/adminAction/edit/(:id)', 
+// post data validation(using express-validator)
+[
+    body('user_email','Invalid email address!').isEmail().custom((value) => {
+        return dbConnection.execute('SELECT email FROM users WHERE email=?', [value])
+        .then(([rows]) => {
+            if(rows.length > 0){
+                return Promise.reject('This E-mail already in use!');
+            }
+            return true;
+        });
+    }),
+    body('user_name','Username is Empty!').trim().not().isEmpty(),
+    body('user_pass','The password must be of minimum length 6 characters').trim().isLength({ min: 6 }),
+],// end of post data validation
+(req,res,next) => {
 
-  app.post('/update/(:id)', ifEdit, (req,res) => {
-    const id = req.body.id;
-    const user_name = req.body.name;
-    const user_email = req.body.email;
-    const user_pass = req.body.password;
-    dbConnection.query(
-        "UPDATE users SET name = ? ,email = ?,password = ? WHERE id = ?",[user_name,user_pass,user_email, id],
-        (err, result) => {
-          if (err) {
-            console.log(err);
-          } else {
-            res.send(result);
-          }
-        }
-      );
+    const validation_result = validationResult(req);
+    const {user_name, user_pass,user_email,id} = req.body;
+    // IF validation_result HAS NO ERROR
+    if(validation_result.isEmpty()){
+        // password encryption (using bcryptjs)
+        bcrypt.hash(user_pass, 12).then((hash_pass) => {
+            // INSERTING USER INTO DATABASE
+            dbConnection.query("UPDATE users SET name = ?, email = ?, password = ? WHERE id = "+ id,[user_name,user_email, hash_pass])
+            .then(result => {
+                res.send(`<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+                <center><br><br>EDIT SUCCESS <br><br>
+                <a href="/admin" class="btn btn-primary">ADMIN</a></center>`);
+            }).catch(err => {
+                // THROW INSERTING USER ERROR'S
+                if (err) throw err;
+            });
+        })
+        .catch(err => {
+            // THROW HASING ERROR'S
+            if (err) throw err;
+        })
+    }
+
 });
+
   app.get('/delete/(:id)', (req, res) => {
     let id = req.params.id;
         dbConnection.query('DELETE FROM users WHERE id = ?', [id], [res,req])
@@ -265,6 +326,11 @@ app.get("/admin", (req,res,next) => {
         });
     
 
-        
-app.listen(process.env.PORT || 3000, () => console.log("Server is Running..."));
-
+    // LOGOUT
+app.get('/logout',(req,res)=>{
+    //session destroy
+    req.session = null;
+    res.redirect('/');
+});
+// END OF LOGOUT    
+server.listen(process.env.PORT || 3000, () => console.log("Server is Running..."));
