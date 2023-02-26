@@ -1,0 +1,33 @@
+<div class="card-body">
+                    <% if(data.length) { %> 
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">name</th>
+                                    <th scope="col">email</th>
+                                    <th width="200px">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (let i=0; i < data.length; t++) { %>
+                                    <tr>
+                                        <th scope="row"><%= (i+1) %></th>
+                                        <td><%= data[i].name %></td>
+                                        <td><%= data[i].email %></td>
+                                        <td>
+                                            <a href="" class="btn btn-success edit">Edit</a>
+                                        </td>
+                                        <td>
+                                            <a href="" onclick="return alert('Are You Sure')" class="btn btn-danger edit">Delete</a>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } %> 
+
+                        <% if (!data.length) {} %>
+                            <p class="text-center">No User Found!</p>
+                        <% } %> 
+                </div>
