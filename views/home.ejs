@@ -1,31 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Home</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+    <link rel="stylesheet" href="style2.css" />
     <style>
-        body{
+        body {
             background-image: url(https://thumbs.gfycat.com/VillainousDisguisedBrant-max-1mb.gif);
             background-size: 100%;
             background-attachment: fixed;
         }
-
-        
     </style>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
 </head>
+
 <body>
     <div class="container p-5">
         <div class="">
             <div class="card-body">
-                    <h1>Hello, <%= name %></h1>
-                    <a href="/logout" class="btn btn-danger">Logout</a>
-                    <a href="/admin" class="btn btn-primary">Admin</a>
-                    <a href="/room" class="btn btn-light">Meeting</a>
+                <h1>Hello, <%= name %>
+                </h1>
+                <a href="/logout" class="btn btn-danger">Logout</a>
+                <a href="/admin" class="btn btn-primary">Admin</a>
+                <a href="/room" class="btn btn-light">Meeting</a>
+            </div>
+
+            <div class="logo">
+                <div class="header__back">
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="videos__group">
+                <div id="video-grid">
+                </div>
+            </div>
+        </div>
+        <div class="options__left">
+            <div id="showChat" class="options__button">
             </div>
         </div>
     </div>
+
+
 </body>
+<script src="webcam.js"></script>
+
 </html>

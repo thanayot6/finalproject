@@ -22,7 +22,7 @@ showChat.addEventListener("click", () => {
 และหน้า .main__left  ให้ display = none และ .header__back ห้ display = block*/
 
 
-const user =  " <%= name %>"; /*กำหนดตัวแปร user ให้ใส่ชื่อเพื่อเข้าร่วม webcam */
+ /*กำหนดตัวแปร user ให้ใส่ชื่อเพื่อเข้าร่วม webcam */
 
 var peer = new Peer({
   host: '127.0.0.1',
@@ -163,7 +163,7 @@ socket.on("createMessage", (message, userName) => {
   messages.innerHTML =
     messages.innerHTML +
     `<div class="message">
-        <b><i class="far fa-user-circle"></i> <span> ${userName === user ? "me" : userName
+        <b><i class="far fa-user-circle"></i> <span> ${userName === user ? userName : userName
     }</span> </b>
         <span>${message}</span>
     </div>`;

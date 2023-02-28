@@ -18,13 +18,7 @@ const io = require("socket.io")(server, {
         origin: '*'
     }
 });
-app.get("/room", (req,res,next) => {
-     let id = req.params.id;
-     dbConnection.query("SELECT * FROM `users` ",[id])
-     .then(([rows]) => {
-        res.render('room',{name:rows[0].name,roomId: req.params.room});
-     });
-  });
+
 
 // app.get("room/:room", (req, res) => {
 //     res.render("room", { roomId: req.params.room });
@@ -95,6 +89,16 @@ app.get('/', ifNotLoggedin, (req,res,next) => {
     });
 });// END OF ROOT PAGE
 
+// app.get("/:room", (req, res) => {
+//     res.redirect(`/${uuidv4()}`);
+// });
+
+app.get("/room", ifNotLoggedin,(req,res,next) => {
+    dbConnection.execute("SELECT `name` FROM `users` WHERE `id`=?",[req.session.userID])
+    .then(([rows]) => {
+       res.render('room',{data:rows[0],roomId: req.params.room})
+      });
+ });
 
 // REGISTER PAGE
 app.post('/register', ifLoggedin, 
@@ -333,4 +337,4 @@ app.get('/logout',(req,res)=>{
     res.redirect('/');
 });
 // END OF LOGOUT    
-server.listen(process.env.PORT || 3000, () => console.log("Server is Running..."));
+server.listen(process.env.PORT || 3000, () => console.log("Server is Running... http://localhost:3000"));
