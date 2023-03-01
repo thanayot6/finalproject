@@ -23,6 +23,7 @@ showChat.addEventListener("click", () => {
 
 
  /*กำหนดตัวแปร user ให้ใส่ชื่อเพื่อเข้าร่วม webcam */
+ const user = prompt("Enter your name");
 
 var peer = new Peer({
   host: '127.0.0.1',

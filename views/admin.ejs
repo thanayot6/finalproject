@@ -20,6 +20,7 @@
         <div class="card">
             <div class="card-body">
                 <a href="/" class="btn btn-secondary mt-2 mb-2 p-2">< BACK</a><a href="/adminAction/Add" class="btn btn-warning ml-2 mt-2 mb-2 p-2">ADD +</a>
+                <a href="/logout" class="btn btn-danger  ml-2 mt-2 mb-2 p-2">Logout</a>
                 <h1>Admin</h1>
 
                     <div class="card-body">
@@ -51,8 +52,9 @@
             
                         <!-- if result is empty -->
                         <% if(!data.length) { %>
-                            <p class="text-center">No book found!</p>
+                            <p class="text-center">No User found!</p>
                             <a href="/logout" class="btn btn-danger">Logout</a>
+                            
                         <% } %>
                     </div>
             </div>

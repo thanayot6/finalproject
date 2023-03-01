@@ -117,7 +117,6 @@ app.post('/register', ifLoggedin,
     body('user_pass','The password must be of minimum length 6 characters').trim().isLength({ min: 6 }),
 ],// end of post data validation
 (req,res,next) => {
-
     const validation_result = validationResult(req);
     const {user_name, user_pass, user_email} = req.body;
     // IF validation_result HAS NO ERROR
@@ -146,7 +145,7 @@ app.post('/register', ifLoggedin,
             return error.msg;
         });
         // REDERING login-register PAGE WITH VALIDATION ERRORS
-        res.render('Login',{
+        res.render('Register',{
             register_error:allErrors,
             old_data:req.body
         });
@@ -155,7 +154,7 @@ app.post('/register', ifLoggedin,
 
 
 // LOGIN PAGE
-app.post('/', ifLoggedin, [
+app.post('/login', ifLoggedin, [
     body('user_email').custom((value) => {
         return dbConnection.execute('SELECT email FROM users WHERE email=?', [value])
         .then(([rows]) => {

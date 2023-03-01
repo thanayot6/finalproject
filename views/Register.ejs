@@ -21,15 +21,15 @@
             <div class="">
                 <form action="/register" method="POST" novalidate>
                         <div class="form-group text-dark">
-                          <label for="_rname">Name</label>
+                          <label for="_rname"><b>Name</b></label>
                           <input type="text" name="user_name" id="_rname" class="form-control" placeholder="Name" value="<%= (locals.old_data) ? old_data.user_name : ''; %>" required>
                         </div>
                         <div class="form-group text-dark">
-                          <label for="_remail">Email</label>
+                          <label for="_remail"><b>Email</b></label>
                           <input type="email" name="user_email" id="_remail" class="form-control" placeholder="Email" value="<%= (locals.old_data) ? old_data.user_email : ''; %>" required>
                         </div>
                         <div class="form-group text-dark">
-                          <label for="_rpass">Password</label>
+                          <label for="_rpass"><b>Password</b></label>
                           <input type="password" name="user_pass" id="_rpass" class="form-control" placeholder="Password" required>
                         </div>
                         <% if (locals.register_error) { 
